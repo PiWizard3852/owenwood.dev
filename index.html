@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <meta
+            name="description"
+            content="Owen Wood — robotics, embedded systems, PCB design, programming, and engineering portfolio."
+    />
+
+    <title>Owen Wood</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: "#f3f1e9",
+                        paper2: "#ebe8dd",
+                        ink: "#151812",
+                        muted: "#6d7166",
+                        signal: "#275d46",
+                    },
+
+                    fontFamily: {
+                        mono: [
+                            "SFMono-Regular",
+                            "Consolas",
+                            "Liberation Mono",
+                            "Menlo",
+                            "monospace",
+                        ],
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        :root {
+            --paper: #f3f1e9;
+            --ink: #151812;
+            --muted: #6d7166;
+            --signal: #275d46;
+            --line: rgba(21, 24, 18, 0.14);
+            --line-strong: rgba(21, 24, 18, 0.28);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px;
+        }
+
+        * {
+            user-select: none;
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        body {
+            background: radial-gradient(
+                    circle at 50% -20%,
+                    rgba(255, 255, 255, 0.9),
+                    transparent 40%
+            ),
+            var(--paper);
+
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            color: var(--paper);
+            background: var(--signal);
+        }
+
+        .page-grid {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.55;
+
+            background-image: linear-gradient(var(--line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--line) 1px, transparent 1px);
+
+            background-size: 48px 48px;
+
+            mask-image: linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.65),
+                    rgba(0, 0, 0, 0.2) 70%,
+                    transparent
+            );
+        }
+
+        .page-grid::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+
+            background-image: linear-gradient(
+                    rgba(21, 24, 18, 0.08) 1px,
+                    transparent 1px
+            ),
+            linear-gradient(
+                    90deg,
+                    rgba(21, 24, 18, 0.08) 1px,
+                    transparent 1px
+            );
+
+            background-size: 240px 240px;
+        }
+
+        .cursor,
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 9999px;
+            translate: -50% -50%;
+        }
+
+        .cursor {
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(39, 93, 70, 0.7);
+
+            transition: width 180ms ease,
+            height 180ms ease,
+            background 180ms ease,
+            border-color 180ms ease;
+        }
+
+        .cursor-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--signal);
+        }
+
+        .cursor.active {
+            width: 54px;
+            height: 54px;
+
+            background: rgba(39, 93, 70, 0.08);
+            border-color: var(--signal);
+        }
+
+        .cursor-glow {
+            position: fixed;
+
+            width: 420px;
+            height: 420px;
+
+            pointer-events: none;
+            z-index: -1;
+
+            translate: -50% -50%;
+
+            border-radius: 9999px;
+
+            background: radial-gradient(
+                    circle,
+                    rgba(39, 93, 70, 0.055),
+                    transparent 66%
+            );
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+
+            transition: opacity 700ms cubic-bezier(0.2, 0.75, 0.25, 1),
+            transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+
+            width: 100%;
+            height: 1px;
+
+            background: var(--signal);
+
+            transform: scaleX(0);
+            transform-origin: right;
+
+            transition: transform 250ms ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .ticker-track {
+            width: max-content;
+            animation: ticker 24s linear infinite;
+        }
+
+        @keyframes ticker {
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .hero-image {
+            transform: scale(1.001);
+            transition: transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1),
+            filter 500ms ease;
+        }
+
+        .hero-image-wrap:hover .hero-image {
+            transform: scale(1.025);
+        }
+
+        .hero-image-scan {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -15%;
+
+            height: 15%;
+
+            pointer-events: none;
+
+            background: linear-gradient(
+                    to bottom,
+                    transparent,
+                    rgba(255, 255, 255, 0.12),
+                    transparent
+            );
+
+            opacity: 0;
+
+            transition: opacity 250ms ease;
+        }
+
+        .hero-image-wrap:hover .hero-image-scan {
+            opacity: 1;
+            animation: imageScan 2.2s ease-in-out infinite;
+        }
+
+        @keyframes imageScan {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(760%);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
+        @media (pointer: coarse) {
+            .cursor,
+            .cursor-dot,
+            .cursor-glow {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cursor,
+            .cursor-dot,
+            .cursor-glow {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="text-ink antialiased">
+<div class="page-grid"></div>
+
+<div class="cursor"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-glow"></div>
+
+<nav
+        class="sticky top-0 z-50 border-b border-ink/15 bg-paper/90 backdrop-blur-md"
+>
+    <div
+            class="mx-auto flex min-h-[74px] w-[min(calc(100%-48px),1180px)] items-center justify-between gap-8 max-sm:w-[calc(100%-28px)]"
+    >
+        <a
+                href="#"
+                class="interactive flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.08em]"
+        >
+            <span>Owen Wood</span>
+        </a>
+
+        <div class="flex items-center gap-7 text-[0.82rem] text-muted">
+            <a
+                    href="#about"
+                    class="nav-link interactive hidden transition-colors hover:text-ink sm:block"
+            >
+                About
+            </a>
+
+            <a
+                    href="#projects"
+                    class="nav-link interactive hidden transition-colors hover:text-ink sm:block"
+            >
+                Projects
+            </a>
+
+            <a
+                    href="#contact"
+                    class="nav-link interactive hidden transition-colors hover:text-ink sm:block"
+            >
+                Contact
+            </a>
+
+            <a
+                    href="https://github.com/PiWizard3852"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="nav-link interactive transition-colors hover:text-ink"
+            >
+                GitHub ↗
+            </a>
+        </div>
+    </div>
+</nav>
+<main>
+    <section
+            class="mx-auto grid min-h-[calc(100vh-75px)] w-[min(calc(100%-48px),1180px)] grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] items-center gap-[70px] py-20 max-sm:w-[calc(100%-28px)] max-lg:min-h-0 max-lg:grid-cols-1 max-lg:py-24"
+    >
+        <div>
+            <div
+                    class="reveal mb-[18px] flex items-center gap-3 font-mono text-[0.72rem] font-semibold uppercase tracking-[0.13em] text-signal before:h-px before:w-[30px] before:bg-signal"
+            >
+                Robotics / Embedded Systems / Software
+            </div>
+            <h1
+                    class="reveal m-0 text-[clamp(4.4rem,10.4vw,9.5rem)] font-medium leading-[0.79] tracking-[-0.087em] max-sm:text-[clamp(4rem,22vw,7rem)]"
+            >
+                Hello, I'm<br/>
+                <span class="text-signal">Owen</span>
+            </h1>
+            <p
+                    class="reveal mt-11 max-w-[670px] text-[clamp(1.05rem,1.6vw,1.35rem)] leading-[1.55] text-muted"
+            >
+                I'm a student at Phillips Exeter Academy interested in robotics, embedded systems, electronics, and
+                software. I build all sorts of things, from competition robots and custom PCBs to compilers and
+                websites.
+            </p>
+            <div class="reveal mt-9 flex flex-wrap gap-3">
+                <a
+                        href="#projects"
+                        class="interactive inline-flex min-h-[46px] items-center justify-center gap-3 border border-ink bg-ink px-[18px] text-[0.78rem] font-semibold uppercase tracking-[0.05em] text-paper transition-all duration-200 hover:-translate-y-0.5 hover:border-signal hover:bg-signal"
+                >
+                    Explore Projects
+                    <span>↓</span>
+                </a>
+                <a
+                        href="#about"
+                        class="interactive inline-flex min-h-[46px] items-center justify-center gap-3 border border-ink/30 px-[18px] text-[0.78rem] font-semibold uppercase tracking-[0.05em] transition-all duration-200 hover:-translate-y-0.5 hover:border-ink"
+                >
+                    About Me
+                </a>
+            </div>
+        </div>
+        <div class="reveal flex justify-center max-lg:justify-start">
+            <div
+                    class="hero-image-wrap group relative aspect-[4/5] w-full max-w-[430px] overflow-hidden border border-ink/30 bg-paper2"
+            >
+                <img
+                        src="./media/woah.jpg"
+                        alt="FTC 15534 VERTEX"
+                        class="hero-image h-full w-full object-cover"
+                />
+                <div
+                        class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent"
+                ></div>
+                <div class="hero-image-scan"></div>
+                <div
+                        class="pointer-events-none absolute left-3 top-3 h-5 w-5 border-l border-t border-white/70"
+                ></div>
+                <div
+                        class="pointer-events-none absolute right-3 top-3 h-5 w-5 border-r border-t border-white/70"
+                ></div>
+                <div
+                        class="pointer-events-none absolute bottom-3 left-3 h-5 w-5 border-b border-l border-white/70"
+                ></div>
+                <div
+                        class="pointer-events-none absolute bottom-3 right-3 h-5 w-5 border-b border-r border-white/70"
+                ></div>
+                <div
+                        class="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-4 p-5"
+                >
+                    <div>
+                        <span
+                                class="block font-mono text-[0.58rem] uppercase tracking-[0.12em] text-white/65"
+                        >
+                           FIRST Tech Challenge Team
+                        </span>
+
+                        <span class="mt-1 block text-sm font-medium text-white">
+                           15534 VERTEX
+                        </span>
+                    </div>
+                    <span
+                            class="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-white/65"
+                    >
+                        FTC World Championship
+                     </span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section
+            class="overflow-hidden border-y border-ink/15 bg-paper/50"
+            aria-hidden="true"
+    >
+        <div
+                id="tickerTrack"
+                class="ticker-track flex items-center gap-7 py-3.5"
+        ></div>
+    </section>
+    <section
+            id="about"
+            class="border-b border-ink/15 py-[130px] max-sm:py-24"
+    >
+        <div
+                class="mx-auto grid w-[min(calc(100%-48px),1180px)] grid-cols-[0.72fr_1.28fr] gap-[100px] max-sm:w-[calc(100%-28px)] max-lg:grid-cols-1 max-lg:gap-12"
+        >
+            <div>
+                <div
+                        class="reveal mb-[18px] flex items-center gap-3 font-mono text-[0.72rem] font-semibold uppercase tracking-[0.13em] text-signal before:h-px before:w-[30px] before:bg-signal"
+                >
+                    About / 00
+                </div>
+                <h2
+                        class="reveal text-[clamp(2.4rem,6vw,5.6rem)] font-medium leading-[0.94] tracking-[-0.065em]"
+                >
+                    btw i use<br/>
+                    vim btw
+                </h2>
+            </div>
+            <div class="reveal max-w-[740px]">
+                <p
+                        class="mb-6 text-[clamp(1.2rem,2.2vw,1.72rem)] leading-[1.5] tracking-[-0.022em]"
+                >
+                    Black boxes make for good side quests.
+                </p>
+                <p class="mb-5 text-[0.98rem] leading-7 text-muted">
+                    I spend my time building robots, embedded systems, electronics, and software. My projects have
+                    ranged from competition robots and custom firmware to developer tools and websites with fewer users
+                    than microservices.
+                </p>
+                <p class="mb-5 text-[0.98rem] leading-7 text-muted">
+                    Most of my work starts with the same question: how much of a system can I understand and build
+                    myself? That has pushed me to work "across the stack," from digital logic in Verilog, to I²C drivers
+                    and embedded firmware, to higher-level applications like a hobby social network. I like to follow
+                    systems all the way down, or at least to the point where it's a mechanical engineer's problem.
+                </p>
+                <p class="text-[0.98rem] leading-7 text-muted">
+                    I want to work on hard technical problems where software, electronics, and the physical world all
+                    matter. I'm most excited by systems that are difficult to build but impactful.
+                </p>
+                <div
+                        class="mt-11 grid grid-cols-2 border-t border-ink/15 max-sm:grid-cols-1"
+                >
+                    <div class="border-b border-ink/15 py-[18px] pr-5">
+                        <span
+                                class="mb-2 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                        >
+                           Languages
+                        </span>
+                        <span class="text-sm">
+                           C / C++ / Rust / Java / Typescript / Verilog
+                        </span>
+                    </div>
+                    <div
+                            class="border-b border-l border-ink/15 py-[18px] pl-5 max-sm:border-l-0 max-sm:pl-0"
+                    >
+                        <span
+                                class="mb-2 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                        >
+                           Concepts
+                        </span>
+                        <span class="text-sm">
+                            Embedded Systems / Ctrl. Theory / CV
+                        </span>
+                    </div>
+                </div>
+                <div
+                        class="grid grid-cols-2 border-ink/15 max-sm:grid-cols-1"
+                >
+                    <div class="border-b border-ink/15 py-[18px] pr-5">
+                        <span
+                                class="mb-2 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                        >
+                           Tools
+                        </span>
+                        <span class="text-sm">
+                           Vim / KiCad / Onshape / LTspice / Git / Docker
+                        </span>
+                    </div>
+                    <div
+                            class="border-b border-l border-ink/15 py-[18px] pl-5 max-sm:border-l-0 max-sm:pl-0"
+                    >
+                        <span
+                                class="mb-2 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                        >
+                           Hobbies
+                        </span>
+                        <span class="text-sm">
+                            Latin / Classics / Music / Speed Typing
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="projects" class="py-[130px] max-sm:py-24">
+        <div
+                class="mx-auto w-[min(calc(100%-48px),1180px)] max-sm:w-[calc(100%-28px)]"
+        >
+            <div
+                    class="mb-16 grid grid-cols-[1fr_0.6fr] items-end gap-20 max-lg:grid-cols-1 max-lg:gap-10"
+            >
+                <div>
+                    <div
+                            class="reveal mb-[18px] flex items-center gap-3 font-mono text-[0.72rem] font-semibold uppercase tracking-[0.13em] text-signal before:h-px before:w-[30px] before:bg-signal"
+                    >
+                        Select Projects / 01
+                    </div>
+                    <h2
+                            class="reveal text-[clamp(2.4rem,6vw,5.6rem)] font-medium leading-[0.94] tracking-[-0.065em]"
+                    >
+                        worked on<br/>
+                        my machine
+                    </h2>
+                </div>
+                <p class="reveal mb-1 max-w-xl leading-7 text-muted">
+                    Well, most of it did.
+                </p>
+            </div>
+            <div id="projectList" class="border-t border-ink/30"></div>
+        </div>
+    </section>
+    <section
+            id="contact"
+            class="border-t border-ink/15 bg-signal/[0.035] py-[130px] max-sm:py-24"
+    >
+        <div
+                class="mx-auto w-[min(calc(100%-48px),1180px)] max-sm:w-[calc(100%-28px)]"
+        >
+            <div
+                    class="grid grid-cols-[1.25fr_0.75fr] gap-16 max-lg:grid-cols-1"
+            >
+                <div>
+                    <div
+                            class="reveal mb-[18px] flex items-center gap-3 font-mono text-[0.72rem] font-semibold uppercase tracking-[0.13em] text-signal before:h-px before:w-[30px] before:bg-signal"
+                    >
+                        Contact / 02
+                    </div>
+                    <h2
+                            class="reveal text-[clamp(3rem,8vw,7rem)] font-medium leading-[0.88] tracking-[-0.07em]"
+                    >
+                        standard<br/>
+                        <span class="text-signal"> i/o</span>
+                    </h2>
+                </div>
+                <div class="reveal flex flex-col justify-end">
+                    <p class="mb-8 max-w-md leading-7 text-muted">
+                        If you made it this far, you might as well say hi.
+                    </p>
+                    <div class="border-t border-ink/20">
+                        <a
+                                href="mailto:owood@exeter.edu"
+                                class="interactive group flex items-center justify-between border-b border-ink/15 py-5"
+                        >
+                            <div>
+                              <span
+                                      class="mb-1 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                              >
+                                 Email
+                              </span>
+                                <span class="text-lg"> owood@exeter.edu </span>
+                            </div>
+                            <span
+                                    class="text-xl transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1"
+                            >
+                              ↗
+                           </span>
+                        </a>
+                        <a
+                                href="tel:+12039181623"
+                                class="interactive group flex items-center justify-between border-b border-ink/15 py-5"
+                        >
+                            <div>
+                              <span
+                                      class="mb-1 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                              >
+                                 Phone
+                              </span>
+                                <span class="text-lg"> (203) 918-1623 </span>
+                            </div>
+                            <span
+                                    class="text-xl transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1"
+                            >
+                              ↗
+                           </span>
+                        </a>
+                        <a
+                                href="https://linkedin.com/in/owood314"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="interactive group flex items-center justify-between border-b border-ink/15 py-5"
+                        >
+                            <div>
+                              <span
+                                      class="mb-1 block font-mono text-[0.61rem] uppercase tracking-[0.08em] text-muted"
+                              >
+                                 LinkedIn
+                              </span>
+                                <span class="text-lg"> owood314 </span>
+                            </div>
+                            <span
+                                    class="text-xl transition-transform duration-200 group-hover:-translate-y-1 group-hover:translate-x-1"
+                            >
+                              ↗
+                           </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer class="pb-8 pt-7">
+    <div
+            class="mx-auto flex w-[min(calc(100%-48px),1180px)] items-center justify-between gap-5 font-mono text-[0.61rem] uppercase tracking-[0.05em] text-muted max-sm:w-[calc(100%-28px)]"
+    >
+        <span> © <span id="year"></span> Owen Wood </span>
+
+        <span
+                id="coordinates"
+                class="min-w-[120px] text-right max-sm:hidden"
+        >
+               X 0000 / Y 0000
+            </span>
+    </div>
+</footer>
+
+<script>
+    const projects = [
+        {
+            name: "Tannin",
+            status: "Compiler",
+
+            description:
+                "Expressive hobbyist programming language implemented in Rust. Developing the frontend compiler architecture, including lexical analysis, parsing, semantic analysis, and eventual language tooling. Source coming soon.",
+
+            technologies: [
+                "Rust",
+                "Compilers",
+                "Language Design",
+            ],
+
+            github: null,
+            deployment: null,
+        },
+
+        {
+            name: "SRSRobotics, LLC",
+            status: "Embedded",
+
+            description:
+                "Custom sensor-interface for FTC robots, designed to optimize sensor read performance and accuracy. Work spans design tradeoffs, several prototypes and revisions of board schematics and layout, STM32Cube programming and integration with FTC controller ecosystem, marketing, distribution, and accounting.",
+
+            technologies: [
+                "PCB Design",
+                "Embedded C++",
+                "I²C",
+                "PWM",
+                "Quadrature"
+            ],
+
+            github: "https://github.com/Simple-Robotics-System",
+            deployment: "https://docs.srsrobotics.com/",
+        },
+
+        {
+            name: "VTXTasks",
+            status: "Tool",
+
+            description:
+                "Suite of tools for my robotics team, including a real-time ticket board and calendar UI and Discord bot. The platform is designed to tightly integrate team-specific needs with our Discord server without sacrificing the ease-of-use of commercial solutions. The platform is OAuth protected with our school's Entra ID services.",
+
+            technologies: [
+                "Next",
+                "TypeScript",
+                "Discord API",
+                "Web Sockets",
+                "SQLite",
+                "ORM",
+                "VPS",
+            ],
+
+            github: null,
+
+            deployment: "https://tasks.ftcvertex.com/",
+        },
+
+        {
+            name: "VERTEX Robotics",
+            status: "Robotics",
+
+            description:
+                "World-class competition robotics system developed for FIRST Tech Challenge. Built autonomous state machines, novel physics-based subsystem controllers, and sensor-driven behavior for high-speed, reliable performance under competition constraints.",
+
+            technologies: [
+                "Java",
+                "C++",
+                "Control Systems",
+                "Robotics",
+                "Physics",
+                "Computer Vision",
+                "State Machines"
+            ],
+
+            github: "https://github.com/15534",
+
+            deployment: null
+        },
+
+        {
+            name: "Vertices & Path Visualizer",
+            status: "Control Theory",
+
+            description:
+                "Catmull-Rom spline follower for mecanum-wheeled drivetrains. Critically damped control with electrical and physical models of the brushed DC motors and wheels. Custom visualizer for routine planning built in Tauri.",
+
+            technologies: [
+                "Java",
+                "Control Systems",
+                "Robotics",
+                "Physics",
+                "HSFM",
+                "Tauri",
+                "Qwik",
+                "TypeScript"
+            ],
+
+            github: null,
+
+            deployment: "https://pathgen.ftcvertex.com/",
+        },
+
+        {
+            name: "Wayve",
+            status: "Web",
+
+            description:
+                "Social network featuring hand-rolled authentication with email verification and basic social features (posting, commenting, (dis)liking, following, et al.).",
+
+            technologies: [
+                "Qwik",
+                "TypeScript",
+                "PostgreSQL",
+                "ORM",
+                "Auth"
+            ],
+
+            github: "https://github.com/PiWizard3852/Wayve",
+
+            deployment: null,
+        },
+    ];
+
+    const projectList = document.getElementById("projectList");
+
+    function createProjectLink(label, href) {
+        if (!href) {
+            return "";
+        }
+
+        return `
+        <a
+          href="${href}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="interactive group relative inline-flex
+                 items-center gap-2
+                 text-[0.72rem] font-semibold
+                 uppercase tracking-[0.06em]"
+        >
+          ${label}
+
+          <span
+            class="transition-transform duration-200
+                   group-hover:-translate-y-0.5
+                   group-hover:translate-x-0.5"
+          >
+            ↗
+          </span>
+        </a>
+      `;
+    }
+
+    projects.forEach((project, index) => {
+        const projectEl = document.createElement("article");
+
+        projectEl.className = `
+        project-card reveal relative grid
+        grid-cols-[70px_minmax(0,1fr)_minmax(220px,0.55fr)]
+        gap-7 border-b border-ink/15 py-9 pr-[18px]
+        hover:bg-white/30
+        max-lg:grid-cols-[45px_1fr]
+        max-sm:grid-cols-1 max-sm:gap-4 max-sm:pr-0
+      `;
+
+        projectEl.innerHTML = `
+        <div
+          class="pt-1.5 font-mono text-[0.7rem] text-muted"
+        >
+          / ${String(index).padStart(2, "0")}
+        </div>
+
+
+        <div>
+
+          <div
+            class="mb-3 flex flex-wrap items-center gap-3"
+          >
+
+            <h3
+              class="text-[clamp(1.55rem,3vw,2.5rem)]
+                     font-medium tracking-[-0.04em]"
+            >
+              ${project.name}
+            </h3>
+
+
+            <span
+              class="border border-ink/15 px-2 py-1
+                     font-mono text-[0.57rem] uppercase
+                     tracking-[0.08em] text-signal"
+            >
+              ${project.status}
+            </span>
+
+          </div>
+
+
+          <p
+            class="max-w-[680px] text-[0.97rem]
+                   leading-[1.65] text-muted"
+          >
+            ${project.description}
+          </p>
+
+        </div>
+
+
+        <div
+          class="flex flex-col justify-between gap-6
+                 max-lg:col-start-2
+                 max-sm:col-auto"
+        >
+
+          <div class="flex flex-wrap gap-2">
+
+            ${project.technologies
+            .map(
+                (tech) => `
+                  <span
+                    class="border border-ink/15 px-2 py-1
+                           font-mono text-[0.62rem] text-muted"
+                  >
+                    ${tech}
+                  </span>
+                `,
+            )
+            .join("")}
+
+          </div>
+
+
+          <div class="flex flex-wrap gap-[18px]">
+
+            ${createProjectLink("Source", project.github)}
+
+            ${createProjectLink("Live", project.deployment)}
+
+            ${
+            !project.github && !project.deployment
+                ? `
+                  <span
+                    class="font-mono text-[0.63rem] text-muted"
+                  >
+                    PRIVATE / OFFLINE
+                  </span>
+                `
+                : ""
+        }
+
+          </div>
+
+        </div>
+      `;
+
+        projectList.appendChild(projectEl);
+    });
+
+    const cursor = document.querySelector(".cursor");
+
+    const cursorDot = document.querySelector(".cursor-dot");
+
+    const cursorGlow = document.querySelector(".cursor-glow");
+
+    let mouseX = window.innerWidth / 2;
+
+    let mouseY = window.innerHeight / 2;
+
+    let cursorX = mouseX;
+
+    let cursorY = mouseY;
+
+    document.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX;
+
+        mouseY = event.clientY;
+
+        cursorDot.style.left = `${mouseX}px`;
+
+        cursorDot.style.top = `${mouseY}px`;
+
+        cursorGlow.style.left = `${mouseX}px`;
+
+        cursorGlow.style.top = `${mouseY}px`;
+
+        const coordinateDisplay = document.getElementById("coordinates");
+
+        if (coordinateDisplay) {
+            coordinateDisplay.textContent =
+                `X ${String(Math.round(mouseX)).padStart(4, "0")} / ` +
+                `Y ${String(Math.round(mouseY)).padStart(4, "0")}`;
+        }
+    });
+
+    function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.13;
+
+        cursorY += (mouseY - cursorY) * 0.13;
+
+        cursor.style.left = `${cursorX}px`;
+
+        cursor.style.top = `${cursorY}px`;
+
+        requestAnimationFrame(animateCursor);
+    }
+
+    animateCursor();
+
+    function bindInteractiveElements() {
+        document.querySelectorAll(".interactive, a").forEach((element) => {
+            element.addEventListener("mouseenter", () => {
+                cursor.classList.add("active");
+            });
+
+            element.addEventListener("mouseleave", () => {
+                cursor.classList.remove("active");
+            });
+        });
+    }
+
+    bindInteractiveElements();
+
+    const skills = [
+        "Embedded Systems",
+        "Rust",
+        "C++",
+        "Robotics",
+        "PCB Design",
+        "Control Loops",
+        "Physics",
+        "Computer Vision",
+        "CAN",
+        "I²C",
+        "PWM",
+        "Sensors",
+        "Compilers",
+        "Electronics",
+        "Web Development",
+        "Typescript"
+    ];
+
+    const tickerTrack = document.getElementById("tickerTrack");
+
+    const repeatedSkills = [...skills, ...skills];
+
+    tickerTrack.innerHTML = repeatedSkills
+        .map(
+            (skill) => `
+            <span
+              class="flex items-center gap-7 whitespace-nowrap
+                     font-mono text-[0.72rem] uppercase
+                     tracking-[0.09em] text-muted
+                     after:text-[0.38rem]
+                     after:text-signal
+                     after:content-['◆']"
+            >
+              ${skill}
+            </span>
+          `,
+        )
+        .join("");
+
+    const revealObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        },
+
+        {
+            threshold: 0.12,
+        },
+    );
+
+    document.querySelectorAll(".reveal").forEach((element) => {
+        revealObserver.observe(element);
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
